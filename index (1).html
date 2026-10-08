@@ -1,0 +1,934 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>McKinsey War Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one narrow briefing column, like a dossier read on a phone at a table */
+:root{
+  --paper:#E9ECE5; --card:#F7F8F3; --ink:#152033; --muted:#596476; --line:#C7CEC3;
+  --accent:#B9652A; --good:#2C7653; --bad:#B0372B;
+  --r-mck:#1F4C8A; --r-cli:#2C7653; --r-acc:#6E3A93; --r-stp:#B4462F;
+  --display:"Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0E1522; --card:#162033; --ink:#E3E7DF; --muted:#9AA4B4; --line:#2B364A;
+  --accent:#E3995A; --good:#63BF8E; --bad:#EE7668;
+  --r-mck:#78A2E3; --r-cli:#63BF8E; --r-acc:#B98ADA; --r-stp:#E58068; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0E1522; --card:#162033; --ink:#E3E7DF; --muted:#9AA4B4; --line:#2B364A;
+  --accent:#E3995A; --good:#63BF8E; --bad:#EE7668;
+  --r-mck:#78A2E3; --r-cli:#63BF8E; --r-acc:#B98ADA; --r-stp:#E58068; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;margin:0}
+.wrap{max-width:580px;margin:0 auto;padding-inline:18px;padding-block:22px 48px;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;line-height:1.08}
+h1{font-size:clamp(2.2rem,9vw,3.1rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.55rem;font-weight:800;letter-spacing:-.01em}
+h3{font-size:1.15rem;font-weight:600}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);font-size:1.02rem;max-width:34em}
+/* War-room hero: a command-centre panel that stays dark in both themes */
+.warhero{--wh-bg:#0A111D; --wh-fg:#EEF1EA; --wh-dim:#93A0B4; --wh-grid:rgba(147,160,180,.13); --wh-amber:#F0A24E; --wh-red:#FF5A4A;
+  position:relative;overflow:hidden;border-radius:8px;background:var(--wh-bg);color:var(--wh-fg);
+  padding:20px 18px 22px;display:flex;flex-direction:column;gap:14px;
+  background-image:linear-gradient(var(--wh-grid) 1px,transparent 1px),linear-gradient(90deg,var(--wh-grid) 1px,transparent 1px);
+  background-size:28px 28px;box-shadow:inset 0 0 0 1px rgba(240,162,78,.25)}
+.warhero>*:not(.wh-scan){position:relative}
+.wh-scan{position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,rgba(240,162,78,.14) 48%,rgba(240,162,78,.0) 52%,transparent 100%);background-size:100% 220%;animation:sweep 6s linear infinite;pointer-events:none}
+@keyframes sweep{from{background-position:0 120%}to{background-position:0 -120%}}
+.wh-top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--wh-dim)}
+.wh-live{display:inline-flex;align-items:center;gap:8px;color:var(--wh-red)}
+.wh-live i{width:8px;height:8px;border-radius:50%;background:var(--wh-red);box-shadow:0 0 0 0 rgba(255,90,74,.6);animation:pulse 1.8s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,90,74,.6)}80%,100%{box-shadow:0 0 0 9px rgba(255,90,74,0)}}
+.wh-kicker{font-family:var(--mono);font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--wh-amber);margin-top:6px}
+.warhero h1{font-size:clamp(2.9rem,14vw,5rem);font-weight:800;line-height:.88;letter-spacing:-.035em;text-transform:uppercase;display:flex;flex-direction:column}
+.warhero h1 span{color:var(--wh-amber);font-size:1.18em;letter-spacing:-.04em}
+.wh-lede{color:var(--wh-dim);font-size:1rem;max-width:34em}
+.wh-meta{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(147,160,180,.3);padding-top:12px;gap:8px}
+.wh-meta div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.wh-meta b{font-family:var(--display);font-size:1.6rem;font-weight:800;line-height:1;color:var(--wh-fg)}
+.wh-meta span{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--wh-dim)}
+@media (max-width:380px){.wh-meta{grid-template-columns:repeat(2,1fr)}}
+@media (prefers-reduced-motion:reduce){.wh-scan,.wh-live i{animation:none}}
+.disclaimer{display:grid;gap:6px;border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:var(--card)}
+.disclaimer p{font-size:.82rem;color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:12px}
+.section-label{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-bottom:1.5px solid var(--ink);padding-bottom:6px}
+
+
+.steps{display:grid;gap:14px;margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start;counter-increment:s}
+.steps li::before{content:counter(s);font-family:var(--mono);font-size:.8rem;width:26px;height:26px;border:1.5px solid var(--ink);border-radius:50%;display:grid;place-items:center}
+.steps b{display:block;font-weight:600}
+.steps span{color:var(--muted);font-size:.93rem}
+
+.map{display:grid;border-top:1px solid var(--line)}
+.map div{display:grid;grid-template-columns:5.6em 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+.map .n{font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.note{font-size:.88rem;color:var(--muted)}
+
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:380px){.roles{grid-template-columns:1fr}}
+.role{all:unset;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0;transition:transform .15s,border-color .15s}
+.role:hover{border-color:var(--rc);transform:translateY(-2px)}
+.role:focus-visible,.opt:focus-visible,.btn:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+.tile{width:38px;height:38px;border-radius:4px;background:var(--rc);color:var(--card);font-family:var(--display);font-weight:800;font-size:1.1rem;display:grid;place-items:center}
+.role .t{font-family:var(--display);font-weight:600;font-size:1.08rem;line-height:1.15}
+.role .p{font-size:.82rem;font-weight:600;color:var(--rc)}
+.role .g{font-size:.85rem;color:var(--muted);line-height:1.35}
+.table-no{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rc)}
+
+/* briefing */
+.seat{display:grid;gap:0;border-top:1px solid var(--line)}
+.seat div{display:grid;gap:2px;padding:10px 0;border-bottom:1px solid var(--line)}
+.seat dt{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.seat dd{margin:0;font-size:.95rem}
+
+/* play */
+.bar{display:flex;flex-direction:column;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px}
+.bar-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.9rem;min-width:0}
+.chip i{width:12px;height:12px;border-radius:2px;background:var(--rc);display:inline-block;flex:none}
+.prog{display:flex;gap:4px}
+.prog span{width:18px;height:6px;border-radius:3px;background:var(--line)}
+.prog span.on{background:var(--rc)}
+.meters{display:grid;gap:8px}
+.meter{display:grid;grid-template-columns:7.5em 1fr 2.4em;gap:10px;align-items:center;font-size:.85rem}
+.meter .lab{color:var(--muted)}
+.meter .track{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.meter .fill{height:100%;background:var(--rc);border-radius:4px;transition:width .6s ease}
+.meter .val{font-family:var(--mono);font-size:.82rem;text-align:right;font-variant-numeric:tabular-nums}
+
+.sec{display:inline-flex;align-self:flex-start;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--rc);border:1px solid var(--rc);border-radius:3px;padding:3px 8px}
+.prompt{display:flex;flex-direction:column;gap:10px}
+.prompt h3{font-size:1.3rem}
+.prompt p{font-size:1.06rem;line-height:1.5}
+.yourcall{font-size:.95rem;border-left:3px solid var(--rc);padding-left:12px}
+.yourcall b{color:var(--rc)}
+.opts{display:grid;gap:10px}
+.opt{all:unset;cursor:pointer;display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:13px 14px;transition:border-color .15s}
+.opt:hover{border-color:var(--rc)}
+.opt .k{font-family:var(--mono);font-size:.9rem;width:30px;height:30px;border-radius:4px;border:1.5px solid var(--rc);color:var(--rc);display:grid;place-items:center}
+.opt .ol{display:block;font-weight:600;line-height:1.35}
+.opt .os{display:block;font-size:.86rem;color:var(--muted);margin-top:3px;line-height:1.4}
+
+.result{display:flex;flex-direction:column;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:18px}
+.picked{font-size:.9rem;color:var(--muted)}
+.picked b{color:var(--ink)}
+.result .what{font-size:1.06rem;line-height:1.55}
+.impact{display:grid;gap:10px}
+.impact div{display:grid;gap:2px}
+.impact .v{font-size:.95rem}
+.standing{font-weight:600}
+.standing.up{color:var(--good)} .standing.down{color:var(--bad)} .standing.flat{color:var(--ink)}
+.deltas{display:flex;flex-wrap:wrap;gap:8px}
+.delta{font-family:var(--mono);font-size:.78rem;padding:4px 9px;border-radius:3px;border:1px solid currentColor;font-variant-numeric:tabular-nums}
+.delta.up{color:var(--good)} .delta.down{color:var(--bad)} .delta.flat{color:var(--muted)}
+.lesson{border-top:1px dashed var(--line);padding-top:12px;font-size:.93rem;display:flex;flex-direction:column;gap:4px}
+
+.btn{all:unset;cursor:pointer;text-align:center;font-weight:600;padding:14px 18px;border-radius:6px;background:var(--ink);color:var(--paper)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btns{display:grid;gap:10px}
+
+/* ending */
+.stamp{display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding:22px 18px;border:2px solid var(--rc);border-radius:6px;background:var(--card)}
+.stamp .badge{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--card);background:var(--rc);padding:4px 9px;border-radius:3px}
+.stamp h2{font-size:clamp(1.9rem,8vw,2.5rem);color:var(--rc)}
+.meaning{background:var(--ink);color:var(--paper);border-radius:6px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.meaning .eyebrow{color:var(--paper);opacity:.75}
+.meaning p{font-family:var(--display);font-weight:600;font-size:1.15rem;line-height:1.3}
+.recap{display:grid;border-top:1.5px solid var(--ink)}
+.recap .row{display:grid;gap:4px;padding:14px 0;border-bottom:1px solid var(--line)}
+.recap .row .ch{font-weight:600}
+.recap .row{gap:8px}
+.recap .row .q{font-size:.93rem;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:10px 12px;line-height:1.45}
+.recap .row .ls{font-size:.88rem;color:var(--muted)}
+.recap .lbl{display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rc);font-weight:500;margin-bottom:1px}
+.qbox{display:grid;gap:4px;font-size:.93rem;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:10px 12px;line-height:1.45}
+.debrief{border:1.5px dashed var(--accent);border-radius:6px;padding:14px 16px;font-size:.95rem;display:grid;gap:4px}
+.debrief b{color:var(--accent)}
+footer{font-size:.78rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+
+@keyframes rise{from{transform:translateY(8px);opacity:.4}to{transform:none;opacity:1}}
+.anim>*{animation:rise .35s ease both}
+@media (prefers-reduced-motion:reduce){.anim>*{animation:none}.meter .fill,.role{transition:none}}
+</style>
+</head>
+<body>
+
+<main class="wrap" id="app" aria-live="polite"></main>
+
+<script>
+(function(){
+const SECTIONS = {
+  1:"McKinsey today",
+  2:"Five forces",
+  3:"Path A: strategy advisor",
+  4:"Path B: tech firm",
+  5:"Trust and reputation",
+  6:"Our recommendation"
+};
+
+const ROLES = {
+  mck:{
+    name:"McKinsey", table:1, letter:"M", color:"var(--r-mck)",
+    title:"Global Managing Partner",
+    goal:"Protect prestige and profit",
+    org:"McKinsey & Company",
+    answer:"The senior partners who elected you",
+    control:"How the firm is staffed, how it charges, what it becomes and which clients it accepts.",
+    stake:"The firm's 100-year reputation, partners' pay and the careers of thousands of consultants.",
+    situation:"Clients are questioning your fees, the Big Four are selling strategy, and AI can now do much of your junior consultants' work.",
+    judge:"the senior partners who elected you",
+    metrics:{profit:"Profit", prestige:"Prestige", relevance:"Future-ready"},
+    decisions:[
+      {sec:1, area:"Your team model",
+       prompt:"AI can now do much of the research and slide work your junior consultants do. Today a few partners lead large teams of juniors, and that leverage is how the firm makes money.",
+       call:"You decide how the firm is staffed for the next decade.",
+       options:[
+        {l:"Keep the pyramid: few partners, many juniors", s:"The model that built the firm.", e:{profit:10,prestige:0,relevance:-15},
+         r:"Profits stay strong for now. But clients can see that AI could do much of what your juniors bill for, and they start asking for discounts.",
+         who:"Partners keep their pay. Clients start questioning bills.",
+         lesson:"The leverage model works only while junior work is hard to automate."},
+        {l:"Move to a diamond: fewer juniors, more experts plus AI", s:"Smaller, more senior teams.", e:{profit:-5,prestige:5,relevance:15},
+         r:"Graduate hiring falls and you invest in experienced specialists and AI tools. Costs rise this year, but each team now delivers faster with fewer people.",
+         who:"Graduates get fewer offers. Clients get more senior attention.",
+         lesson:"This is the team model our group recommends in Section 6."},
+        {l:"Replace most juniors with AI", s:"Cut costs quickly.", e:{profit:15,prestige:-10,relevance:5},
+         r:"Margins jump. But you lose the pipeline that trains future partners, and top graduates start to see McKinsey as a weaker place to build a career.",
+         who:"Thousands of juniors leave. Your future partner pipeline shrinks.",
+         lesson:"Talent is McKinsey's core resource, even when supplier power is weak."},
+        {l:"Retrain juniors as AI and data specialists", s:"Keep the people, change the skills.", e:{profit:-10,prestige:5,relevance:10},
+         r:"Training is expensive and slows projects for a year, but your consultants can now build AI solutions, not just slides.",
+         who:"Juniors keep their jobs with new skills. Partners accept lower pay this year.",
+         lesson:"Resource-based view: rebuilding capabilities from within."}
+      ]},
+      {sec:2, area:"Pricing under pressure",
+       prompt:"Buyer power is strong. Many clients now employ ex-consultants, and they say AI makes your work faster, so it should cost less.",
+       call:"You set how the firm charges every client.",
+       options:[
+        {l:"Keep premium hourly rates", s:"Defend the value of your experts.", e:{profit:10,prestige:5,relevance:-15},
+         r:"Profits hold this year. But CFOs start sending smaller projects to cheaper firms and AI tools.",
+         who:"Partners are protected this year. Smaller clients drift to rivals.",
+         lesson:"Buyer power: clients have the knowledge and tools to question fees."},
+        {l:"Charge for results delivered", s:"Part of each fee depends on the client's outcome.", e:{profit:5,prestige:5,relevance:15},
+         r:"Clients like that you share the risk. Revenue becomes less predictable, and every team now has to prove real impact.",
+         who:"Your teams carry more risk. Clients see clearer value.",
+         lesson:"This answers the case's ROI problem: clients struggle to see what consulting is worth."},
+        {l:"Cut fees by 20%", s:"Keep clients by being cheaper.", e:{profit:-20,prestige:-10,relevance:5},
+         r:"Clients stay, but margins shrink and the market reads it as an admission that your work was overpriced.",
+         who:"Clients pay less. Partners' bonuses fall.",
+         lesson:"Competing on price weakens a premium brand."},
+        {l:"Sell a yearly subscription of AI tools plus advisers", s:"Recurring income instead of one-off projects.", e:{profit:5,prestige:0,relevance:10},
+         r:"You gain steady, recurring income, like McKinsey Solutions in the case. Margins per project fall and you start to look like a software company.",
+         who:"Clients get ongoing support. You start competing with software companies.",
+         lesson:"Moving beyond the one-off project model."}
+      ]},
+      {sec:3, area:"Defending the boardroom",
+       prompt:"The Big Four now sell strategy through EY-Parthenon, Strategy& and Monitor Deloitte. They are pitching your biggest CEO clients.",
+       call:"You decide how to protect McKinsey's most prestigious work.",
+       options:[
+        {l:"Focus only on CEO and board-level work", s:"Turn down smaller projects.", e:{profit:-10,prestige:15,relevance:-5},
+         r:"Your brand gets sharper and boards still call you first. Revenue falls as you turn down mid-size work your rivals happily take.",
+         who:"Partners focus on fewer, bigger clients. Junior work shrinks.",
+         lesson:"Path A's strength is prestige. Its weakness is a shrinking market."},
+        {l:"Build deep industry expertise in every sector", s:"Hire specialists, not just generalists.", e:{profit:-5,prestige:10,relevance:10},
+         r:"Clients now get advisers who know their industry in detail. It costs more to hire, but your advice is harder for rivals to copy.",
+         who:"Specialists join from industry. Generalist consultants must adapt.",
+         lesson:"Advice that is hard to copy keeps a premium."},
+        {l:"Match the Big Four on price", s:"Don't lose clients over fees.", e:{profit:-15,prestige:-10,relevance:0},
+         r:"You keep the clients, but boards now compare you with accounting firms on price, and your premium position slips.",
+         who:"Clients win on price. Your brand loses its edge.",
+         lesson:"Rivalry on price lowers profits for the whole industry."},
+        {l:"Use your alumni network to win work", s:"Ex-McKinsey executives now run many client firms.", e:{profit:5,prestige:5,relevance:-5},
+         r:"Old relationships bring in projects quickly. But former consultants know exactly what you do, and they push hardest on price and value.",
+         who:"Alumni open doors. They also negotiate harder.",
+         lesson:"The Big Three have about 50,000 alumni, many now at client firms."}
+      ]},
+      {sec:4, area:"The tech question",
+       prompt:"Classic strategy is now about 10% of the Big Three's revenue. Most growth is in technology and implementation, where Accenture is far bigger.",
+       call:"You decide what McKinsey becomes.",
+       options:[
+        {l:"Become a full AI and tech implementation firm", s:"Build and run systems for clients.", e:{profit:-5,prestige:-15,relevance:15},
+         r:"You win large build-and-run contracts, but now compete with Accenture on its home turf, with fewer engineers and thinner margins.",
+         who:"Thousands of engineers join. Strategy partners feel sidelined.",
+         lesson:"Path B's risk: losing what makes McKinsey different."},
+        {l:"Buy AI startups and run them as a separate tech arm", s:"Keep the core brand focused.", e:{profit:-10,prestige:5,relevance:10},
+         r:"The core brand stays focused while the tech arm grows, as McKinsey did with QuantumBlack. Integration is slow and costly.",
+         who:"Startup founders join the firm. Two cultures must work together.",
+         lesson:"Buying capabilities you can't build fast enough."},
+        {l:"Stay strategy-led, but use AI to help clients deliver", s:"Expert teams, AI tools, help with implementation.", e:{profit:5,prestige:5,relevance:10},
+         r:"Expert teams with AI tools advise and help put plans into action. You keep board access and add staying power.",
+         who:"Consultants learn to work alongside AI. Clients get advice that gets implemented.",
+         lesson:"The hybrid path our group recommends in Section 6."},
+        {l:"Partner with tech firms to do the building", s:"You design, a partner builds.", e:{profit:5,prestige:0,relevance:5},
+         r:"You design the strategy and a tech partner builds it. It's quick and cheap, but clients start to wonder why they need two firms.",
+         who:"Your tech partner gains access to your clients.",
+         lesson:"Partnering is fast, but it hands rivals your relationships."}
+      ]},
+      {sec:5, area:"A $50M contract",
+       prompt:"A government facing corruption allegations offers McKinsey a $50M contract. Your partners are split.",
+       call:"You decide what McKinsey's name stands for.",
+       options:[
+        {l:"Decline and tighten client-screening rules", s:"Lose the money, protect the name.", e:{profit:-10,prestige:15,relevance:0},
+         r:"You lose $50M, but clients and recruits notice that you turn work down on principle.",
+         who:"Partners lose fees. Recruits and clients see a firm with principles.",
+         lesson:"Institution-based view: integrity and legitimacy are core assets."},
+        {l:"Take it quietly and keep it confidential", s:"Nobody needs to know.", e:{profit:15,prestige:-40,relevance:0}, flag:"scandal",
+         r:"Eighteen months later the contract leaks. Headlines, apologies and lost clients follow, much like McKinsey's South Africa scandal.",
+         who:"Every client and employee is asked about it. Senior leaders resign.",
+         lesson:"Monitor Group's Libya work contributed to its collapse in 2012."},
+        {l:"Take a limited project with an independent ethics review", s:"Narrow scope, public terms.", e:{profit:5,prestige:-5,relevance:0},
+         r:"You take a narrower project with public terms and outside review. Critics stay vocal, but nothing is hidden.",
+         who:"Critics stay vocal. Clients can defend working with you.",
+         lesson:"Managing reputational risk through transparency."},
+        {l:"Take it openly. It is legal and profitable", s:"Clients hire you for results, not politics.", e:{profit:15,prestige:-25,relevance:0},
+         r:"It's legal, but journalists and activists focus on you. Some clients quietly move their work elsewhere.",
+         who:"Clients face questions from their own boards.",
+         lesson:"What is legal is not always seen as legitimate."}
+      ]}
+    ],
+    ending(m,f){
+      if(f.scandal) return "monitor";
+      if(m.relevance<45) return "dinosaur";
+      if(m.prestige<40) return "lite";
+      if(m.profit<35) return "discount";
+      if(m.relevance>=70 && m.prestige>=60) return "advisor";
+      return "survivor";
+    },
+    endings:{
+      monitor:{t:"Monitor's Fate", s:"One hidden contract undid a century of reputation. Clients don't pay premium fees to a firm they can't defend to their own board.", m:"Whatever path McKinsey takes, trust decides whether clients still pay a premium."},
+      dinosaur:{t:"The Disrupted Dinosaur", s:"You protected the old model. Clients, rivals and AI tools moved on, and your work started to look expensive and slow.", m:"Doing nothing is the riskiest choice when four of the five forces are strong."},
+      lite:{t:"Accenture Lite", s:"You chased tech and price so hard that you lost what made you special. Boards no longer see a reason to pay McKinsey prices.", m:"Tech should support McKinsey's advantage, not replace it."},
+      discount:{t:"The Discount Shop", s:"You kept clients by spending and cutting. Revenue holds, but the partner model that pays for top talent starts to crack.", m:"Cutting costs and prices alone doesn't fix the leverage model."},
+      advisor:{t:"The AI-Powered Advisor", s:"You kept board-level trust and used AI to work faster with smaller expert teams. Clients pay for results, not hours.", m:"Stay strategy-led and use AI to deliver. This is our group's recommendation."},
+      survivor:{t:"The Steady Survivor", s:"You avoided disaster but didn't commit to a clear direction. Rivals that moved faster are closing the gap.", m:"Half-measures buy time, not advantage."}
+    }
+  },
+
+  cli:{
+    name:"Client Board", table:2, letter:"C", color:"var(--r-cli)",
+    title:"Chair of the Board",
+    goal:"Get the best value for money",
+    org:"a large Australian bank",
+    answer:"The bank's shareholders",
+    control:"Which advisers the bank hires, what it pays them and the bank's biggest strategic bets.",
+    stake:"Shareholder value, the bank's reputation and your own position as Chair.",
+    situation:"The bank spends $5M a year on McKinsey. Your CFO says AI tools and your own team could now do some of that work.",
+    judge:"your shareholders",
+    metrics:{value:"Value", results:"Results", reputation:"Reputation"},
+    decisions:[
+      {sec:1, area:"Who does the work?",
+       prompt:"Your McKinsey project has 2 partners who attend board meetings and 10 junior analysts who do most of the work. You are billed premium rates for all of it.",
+       call:"You decide what the bank accepts from its advisers.",
+       options:[
+        {l:"Accept it. This is how consulting works", s:"Don't disrupt a working relationship.", e:{value:-10,results:5,reputation:0},
+         r:"The project runs smoothly, but you are paying premium rates for work mostly done by graduates.",
+         who:"Your CFO keeps flagging the cost.",
+         lesson:"The leverage model: clients pay for senior names while juniors do the work."},
+        {l:"Require named partners to spend set hours on your work", s:"Get the experience you pay for.", e:{value:5,results:10,reputation:0},
+         r:"Senior attention improves the advice. McKinsey adds the extra partner time to the bill.",
+         who:"Partners spend more time with your executives.",
+         lesson:"Clients want real senior expertise, not just senior names."},
+        {l:"Ask for a smaller senior team that uses AI", s:"Fewer people, more experience.", e:{value:15,results:5,reputation:0},
+         r:"McKinsey agrees to a team of four experts plus AI tools. The bill drops and the work arrives faster.",
+         who:"Fewer juniors on your project. Your team works directly with experts.",
+         lesson:"Clients are pushing consulting towards the smaller diamond model."},
+        {l:"Demand a breakdown of who did what and for how long", s:"Full transparency on the bill.", e:{value:10,results:0,reputation:5},
+         r:"You can now see where the money goes. The relationship becomes more formal and slower.",
+         who:"Your board sees exactly what it pays for.",
+         lesson:"The case notes that consulting work is hard for clients to see into."}
+      ]},
+      {sec:2, area:"Using your bargaining power",
+       prompt:"Your CFO reviews the $5M annual consulting bill. Much of it paid for research and slides that AI tools can now draft.",
+       call:"You decide how hard the bank pushes on price.",
+       options:[
+        {l:"Run a tender: McKinsey vs Accenture vs Big Four vs boutiques", s:"Make firms compete for your work.", e:{value:10,results:5,reputation:5},
+         r:"Firms compete for your work and prices drop. The process takes three months and annoys your current advisers.",
+         who:"Rivals compete for your business. Current advisers are unhappy.",
+         lesson:"Buyer power in action: clients play rivals against each other."},
+        {l:"Keep paying. The brand is worth it", s:"Don't fix what works.", e:{value:-15,results:5,reputation:0},
+         r:"Quality stays high, but you can't show shareholders what the extra cost bought.",
+         who:"Shareholders may ask about the cost.",
+         lesson:"Clients that don't use their bargaining power overpay."},
+        {l:"Cancel and build an in-house team of ex-consultants with AI", s:"Bring the work inside.", e:{value:15,results:-15,reputation:0},
+         r:"You save millions, but your new team is small and stretched. Big projects slip.",
+         who:"Your managers take on consulting work they haven't done before.",
+         lesson:"Substitutes: in-house teams can replace consultants, but capability takes time."},
+        {l:"Renegotiate: results-based fees", s:"Pay for impact, not hours.", e:{value:15,results:10,reputation:0},
+         r:"McKinsey agrees to tie part of its fee to results. You pay for impact, and partners take a closer interest in your work.",
+         who:"McKinsey's fees now depend on your results.",
+         lesson:"Clients increasingly demand a clear return on investment."}
+      ]},
+      {sec:3, area:"Paying for prestige",
+       prompt:"The bank plans a $500M expansion into Asia. The board and investors need to trust the plan.",
+       call:"You choose who advises on the bank's biggest decision this decade.",
+       options:[
+        {l:"Your own in-house strategy team", s:"Cheap, fast and knows the bank.", e:{value:15,results:-5,reputation:-5},
+         r:"Cheap and fast, and your team knows the bank well. Some directors worry that nobody outside has tested the plan.",
+         who:"Your strategy team gets a big chance. The board wants outside validation.",
+         lesson:"Samsung's Global Strategy Group shows in-house teams can work."},
+        {l:"Accenture: strategy plus implementation", s:"One firm plans and builds.", e:{value:0,results:15,reputation:5},
+         r:"One firm plans and builds the systems. Execution is strong, though the strategy is less bold.",
+         who:"One firm owns both the plan and the systems.",
+         lesson:"Tech firms now compete for strategy work."},
+        {l:"McKinsey, for prestige and board confidence", s:"The safest name for a big decision.", e:{value:-10,results:10,reputation:10},
+         r:"Investors take the plan seriously because McKinsey's name is on it. It is also the most expensive option.",
+         who:"Investors feel reassured. Your CFO feels the cost.",
+         lesson:"Path A's value: consultants sell legitimacy for high-stakes decisions."},
+        {l:"A specialist boutique with Asia expertise", s:"Deep local knowledge, smaller name.", e:{value:10,results:5,reputation:-5},
+         r:"Deep local knowledge at a fair price. Some directors ask why you didn't use a big name.",
+         who:"Specialists lead the work. Some directors want a bigger name.",
+         lesson:"Boutiques win on specialist knowledge."}
+      ]},
+      {sec:4, area:"The AI transformation",
+       prompt:"McKinsey offers a three-year contract to design and build the bank's AI systems. Accenture offers to do it for less.",
+       call:"You decide who builds the bank's future technology.",
+       options:[
+        {l:"Sign with McKinsey", s:"One trusted firm for strategy and tech.", e:{value:-10,results:5,reputation:5},
+         r:"Board confidence is high, but McKinsey's tech teams are smaller than Accenture's and some deadlines slip.",
+         who:"McKinsey's tech arm learns on your project.",
+         lesson:"Path B: McKinsey is still building its tech capabilities."},
+        {l:"Give it to Accenture, the tech specialist", s:"Scale and price.", e:{value:10,results:10,reputation:0},
+         r:"Delivery is strong and cheaper. The strategy behind it is less ambitious.",
+         who:"Accenture gains a foothold in your boardroom.",
+         lesson:"In tech work, Accenture has the advantage of scale."},
+        {l:"Split it: McKinsey designs, Accenture builds", s:"Best of both firms.", e:{value:-5,results:10,reputation:5},
+         r:"You get strong strategy and strong delivery, but managing two firms takes effort and blame is easy to pass around.",
+         who:"Your team coordinates two firms.",
+         lesson:"Strategy and tech firms can complement each other."},
+        {l:"Build it in-house with AI software vendors", s:"Own the technology yourself.", e:{value:15,results:-10,reputation:0},
+         r:"Much cheaper and you own the result, but your team lacks experience and the project takes twice as long.",
+         who:"Your IT team grows. Consultants lose a large contract.",
+         lesson:"Substitutes keep growing as AI tools improve."}
+      ]},
+      {sec:5, area:"The headline",
+       prompt:"McKinsey is in the news for advising a government accused of corruption. Your shareholders ask why the bank still uses them.",
+       call:"You decide how the bank responds, in public and in private.",
+       options:[
+        {l:"Stay quiet and keep working with them", s:"Their work for you has been good.", e:{value:5,results:5,reputation:-25},
+         r:"Work continues smoothly, but journalists list your bank as a McKinsey client and shareholders keep asking.",
+         who:"Journalists name your bank in their articles.",
+         lesson:"A consulting firm's reputation spreads to its clients."},
+        {l:"Pause new work and ask for an ethics review", s:"Act without burning the bridge.", e:{value:0,results:-5,reputation:10},
+         r:"You show shareholders you take it seriously without ending the relationship.",
+         who:"McKinsey's team waits. Shareholders see action.",
+         lesson:"Clients can use their power to demand better behaviour."},
+        {l:"Leave publicly and switch firms", s:"Make a clear statement.", e:{value:-10,results:-10,reputation:15},
+         r:"Shareholders approve. Switching firms mid-project costs time and money.",
+         who:"Your projects are disrupted. Shareholders approve.",
+         lesson:"Scandals cost consulting firms clients, as Monitor Group found."},
+        {l:"Finish current projects, then move future work in-house", s:"Reduce dependence quietly.", e:{value:5,results:-5,reputation:5},
+         r:"You quietly reduce your reliance on any one firm. Less drama, slower change.",
+         who:"Your own team grows. McKinsey loses future work.",
+         lesson:"Clients bring work in-house to control cost and risk."}
+      ]}
+    ],
+    ending(m){
+      if(m.reputation<35) return "guilty";
+      if(m.value<40) return "loyalist";
+      if(m.results<40) return "gamble";
+      if(m.value>=65 && m.results>=60) return "smart";
+      return "cautious";
+    },
+    endings:{
+      guilty:{t:"Guilty by Association", s:"Your work got done, but your bank's name sits next to a scandal in every article.", m:"McKinsey's reputation problems become its clients' problems, so clients leave."},
+      loyalist:{t:"The Overpaying Loyalist", s:"You got good work at a premium price, with little proof of what it was worth.", m:"Clients like this are becoming rare, which is why McKinsey's pricing must change."},
+      gamble:{t:"The In-House Gamble", s:"You saved a lot of money, but your team couldn't deliver at the level the bank needed.", m:"Substitutes are real, but McKinsey still wins when the stakes are high."},
+      smart:{t:"The Smart Buyer", s:"You used your bargaining power to get strong results at a fair price, and you can prove what you paid for.", m:"Smart buyers are the future, and they want results-based pricing."},
+      cautious:{t:"The Cautious Board", s:"No big mistakes, no big wins. You paid a fair price for fair work.", m:"Clients weigh their options carefully now, so McKinsey must earn every engagement."}
+    }
+  },
+
+  acc:{
+    name:"Accenture", table:3, letter:"A", color:"var(--r-acc)",
+    title:"Chief Executive Officer",
+    goal:"Win the AI consulting race",
+    org:"Accenture",
+    answer:"Accenture's board and shareholders",
+    control:"Strategy, investment and how Accenture competes with McKinsey.",
+    stake:"Growth targets, investor confidence and hundreds of thousands of jobs.",
+    situation:"You have far more technology staff than McKinsey. Now you want its boardroom work too.",
+    judge:"your board and investors",
+    metrics:{growth:"Growth", margin:"Margin", cred:"Board credibility"},
+    decisions:[
+      {sec:1, area:"Your people model",
+       prompt:"Accenture runs huge delivery teams at lower rates than McKinsey. AI can now automate much of that delivery work too.",
+       call:"You decide what happens to your workforce.",
+       options:[
+        {l:"Automate delivery with AI and reduce headcount", s:"Higher margins, fewer people.", e:{growth:0,margin:15,cred:-5},
+         r:"Margins improve fast. Layoffs make headlines and some clients worry about losing the teams they rely on.",
+         who:"Thousands of staff leave. Investors approve.",
+         lesson:"AI threatens every firm built on large teams, not just McKinsey."},
+        {l:"Move existing staff onto AI projects", s:"Keep people, change the work.", e:{growth:10,margin:-5,cred:5},
+         r:"Your teams stay busy on new AI work. Retraining costs money, but clients see continuity.",
+         who:"Staff keep their jobs with new skills.",
+         lesson:"Rebuilding capabilities from within."},
+        {l:"Build small senior strategy teams to compete with McKinsey", s:"Win CEO conversations, not just CIO ones.", e:{growth:5,margin:-10,cred:10},
+         r:"You start winning conversations with CEOs, not just technology chiefs. Senior hires are expensive.",
+         who:"Experienced strategists join. Delivery teams wonder where they fit.",
+         lesson:"Copying McKinsey's model to attack its core market."},
+        {l:"Keep the model and charge more for AI-skilled staff", s:"Higher rates for scarce skills.", e:{growth:5,margin:10,cred:0},
+         r:"Revenue per person rises. Clients compare your rates with smaller AI firms and push back.",
+         who:"AI-skilled staff earn more. Clients start comparing prices.",
+         lesson:"Buyer power limits how far any firm can raise prices."}
+      ]},
+      {sec:2, area:"Going after McKinsey's clients",
+       prompt:"McKinsey's clients are questioning its fees. Rivalry in consulting is at its highest point in years.",
+       call:"You decide how Accenture competes.",
+       options:[
+        {l:"Partner with McKinsey: they advise, you build", s:"Share the work instead of fighting.", e:{growth:5,margin:5,cred:5},
+         r:"Steady joint work and good margins, but you are helping your biggest rival keep the boardroom.",
+         who:"McKinsey keeps the boardroom. You keep the build work.",
+         lesson:"Rivals can also cooperate. Boundaries in consulting are blurry."},
+        {l:"Sell strategy-plus-build bundles", s:"Advise on AI and deliver the system.", e:{growth:15,margin:0,cred:5},
+         r:"Clients like one firm owning the result. Your strategy advice is still seen as second to McKinsey's.",
+         who:"Clients get one firm for advice and delivery.",
+         lesson:"Bundling advice with delivery to win clients."},
+        {l:"Undercut McKinsey on price", s:"Win deals by being cheaper.", e:{growth:15,margin:-20,cred:-5},
+         r:"You win deals fast, but low prices tell boards you are the cheaper option, not the better one.",
+         who:"Clients save money. Your margins shrink.",
+         lesson:"Price wars lower profitability across the industry."},
+        {l:"Hire senior strategists away from McKinsey and BCG", s:"Buy boardroom credibility.", e:{growth:10,margin:-10,cred:15},
+         r:"Big names join and open boardroom doors, at a high salary cost.",
+         who:"McKinsey loses senior people to you.",
+         lesson:"The Big Four used this route into strategy consulting."}
+      ]},
+      {sec:3, area:"The boardroom call",
+       prompt:"A CEO asks you whether to sell a whole division. This is McKinsey's home turf: high stakes, no clear answer.",
+       call:"You decide whether Accenture competes for pure strategy work.",
+       options:[
+        {l:"Decline, refer it on, offer to implement afterwards", s:"Stick to what you do best.", e:{growth:-5,margin:5,cred:0},
+         r:"You keep your margins and the relationship, but McKinsey keeps the boardroom.",
+         who:"McKinsey keeps the advice work.",
+         lesson:"Path A shows why boardroom trust is hard to win."},
+        {l:"Launch a dedicated strategy brand for work like this", s:"A separate name for boardroom advice.", e:{growth:10,margin:-5,cred:15},
+         r:"Like EY-Parthenon or Strategy&, a separate brand gives you credibility, at a real setup cost.",
+         who:"A new strategy team builds its own reputation.",
+         lesson:"The Big Four's move into strategy consulting."},
+        {l:"Take it on with your current team", s:"Win the fee now.", e:{growth:10,margin:10,cred:-10},
+         r:"You win the fee, but the advice is shallow and the CEO notices.",
+         who:"The CEO judges your strategy skills on this one project.",
+         lesson:"Prestige and judgement are hard to copy."},
+        {l:"Take it with a specialist boutique as partner", s:"Their depth, your scale.", e:{growth:5,margin:0,cred:10},
+         r:"The boutique brings depth, you bring scale. The CEO is impressed.",
+         who:"The boutique gains a big client through you.",
+         lesson:"Combining specialist knowledge with scale."}
+      ]},
+      {sec:4, area:"The AI bet",
+       prompt:"You have billions to invest in AI. Whoever leads in AI consulting will set the pace for the industry.",
+       call:"You decide where the money goes.",
+       options:[
+        {l:"Retrain your hundreds of thousands of staff in AI", s:"Upgrade the whole workforce.", e:{growth:5,margin:-5,cred:10},
+         r:"Slow and expensive, but your whole workforce can now deliver AI projects.",
+         who:"Your whole workforce gains AI skills.",
+         lesson:"Resource-based view: people are the core capability."},
+        {l:"Buy AI startups", s:"Get tools and talent fast.", e:{growth:15,margin:-10,cred:5},
+         r:"You gain tools and talent quickly. Integrating ten acquisitions is messy.",
+         who:"Founders join. Integration teams are stretched.",
+         lesson:"New entrants often end up acquired, like BeyondCore by Salesforce."},
+        {l:"Build your own AI platforms", s:"Own tools nobody else has.", e:{growth:5,margin:-10,cred:10},
+         r:"Costly to build, but you own the tools and clients can't get them anywhere else.",
+         who:"Engineers build tools only you own.",
+         lesson:"Unique resources create lasting advantage."},
+        {l:"Partner with major AI and cloud companies", s:"Fast and cheap to launch.", e:{growth:10,margin:5,cred:0},
+         r:"Quick to launch and cheap, but competitors can sign the same partnerships.",
+         who:"Your services depend on your partners' plans.",
+         lesson:"Resources that are easy to copy don't give lasting advantage."}
+      ]},
+      {sec:5, area:"A sensitive contract",
+       prompt:"A major client wants an AI system that monitors every keystroke its employees make. It is legal, but staff would object if they knew.",
+       call:"You decide what Accenture's name is attached to.",
+       options:[
+        {l:"Decline the contract", s:"Set limits on how your AI is used.", e:{growth:-5,margin:-5,cred:10},
+         r:"You lose a large deal, but clients see a firm that sets limits on how AI is used.",
+         who:"Your sales team misses a target.",
+         lesson:"Integrity is part of what every consulting firm sells."},
+        {l:"Take it with strict privacy rules and full disclosure to staff", s:"Do it openly and carefully.", e:{growth:5,margin:0,cred:5},
+         r:"The client accepts tighter limits. It's less profitable, but you can defend it in public.",
+         who:"The client's staff know what is monitored.",
+         lesson:"Transparency reduces reputational risk."},
+        {l:"Take it quietly, as the client asked", s:"The client wants discretion.", e:{growth:10,margin:10,cred:-30}, flag:"scandal",
+         r:"A year later an employee leaks the details. Your name is in the headlines, and other clients pause AI projects with you.",
+         who:"Clients and staff question your judgement.",
+         lesson:"Hidden work becomes a scandal when it surfaces."},
+        {l:"Build the tool, leave its use to the client", s:"The client decides how to use it.", e:{growth:10,margin:5,cred:-10},
+         r:"Legally it is the client's responsibility, but critics still ask why you built it.",
+         who:"The client carries the legal risk. You carry the reputation risk.",
+         lesson:"What is legal is not always seen as legitimate."}
+      ]}
+    ],
+    ending(m,f){
+      if(f.scandal) return "headline";
+      if(m.margin<30) return "over";
+      if(m.cred<55) return "bland";
+      if(m.growth>=75 && m.cred>=75) return "champ";
+      return "contender";
+    },
+    endings:{
+      headline:{t:"Headline Risk", s:"One quiet contract undid years of trust-building. Boards now hesitate to give you their most sensitive work.", m:"Trust matters for every consulting firm. It is McKinsey's best defence against Accenture."},
+      over:{t:"Overstretched", s:"You grew fast but spent too much. Investors ask when the AI bets will pay off.", m:"McKinsey can't win on scale either, so it must stay focused on what it does best."},
+      bland:{t:"Big but Bland", s:"You are the biggest AI consulting firm, but for the hardest decisions, boards still call McKinsey.", m:"McKinsey's boardroom trust is still its moat."},
+      champ:{t:"The AI Champion", s:"You combined scale, AI tools and new strategy talent. You now win work McKinsey used to own.", m:"This is McKinsey's biggest threat, and the reason it must change."},
+      contender:{t:"The Solid Contender", s:"You grew steadily and stayed profitable. You're closing the gap on McKinsey without overtaking it yet.", m:"Rivalry is strong and getting stronger."}
+    }
+  },
+
+  stp:{
+    name:"AI Startup", table:4, letter:"S", color:"var(--r-stp)",
+    title:"Founder and CEO",
+    goal:"Disrupt the big firms",
+    org:"a two-year-old AI consulting startup",
+    answer:"Your investors",
+    control:"Your product, your customers and whether you sell the company.",
+    stake:"Your company, your team's jobs and your investors' money.",
+    situation:"Your AI tool does market research and slide decks in minutes. Consulting is unregulated, so nothing stops you entering the market.",
+    judge:"your investors",
+    metrics:{growth:"Growth", cash:"Cash runway", indep:"Independence"},
+    decisions:[
+      {sec:1, area:"What your AI replaces",
+       prompt:"Consulting firms make money from teams of juniors doing research, analysis and slides. Your AI can do some of that in minutes.",
+       call:"You decide which part of consulting work you go after.",
+       options:[
+        {l:"Research and data analysis", s:"The most time-consuming junior work.", e:{growth:10,cash:5,indep:5},
+         r:"Your tool is fast and accurate at the most time-consuming junior tasks. Easy to sell, but easy for others to copy.",
+         who:"Junior analysts at big firms feel the pressure first.",
+         lesson:"AI targets the base of the leverage model."},
+        {l:"Slide decks and reports", s:"Polished output in minutes.", e:{growth:10,cash:5,indep:0},
+         r:"Clients love polished output in minutes. But consulting firms can build this themselves.",
+         who:"Consultants spend less time on slides.",
+         lesson:"Routine work is easiest to automate and to copy."},
+        {l:"Full strategy recommendations", s:"Go after the partners' work.", e:{growth:5,cash:-10,indep:10},
+         r:"Your boldest pitch. Few clients trust an AI to make strategic recommendations yet, so sales are slow.",
+         who:"You challenge partners directly, not just juniors.",
+         lesson:"Judgement at the top of the pyramid is hardest to replace."},
+        {l:"A co-pilot that makes consultants faster", s:"Help firms rather than replace them.", e:{growth:5,cash:15,indep:-10},
+         r:"Consulting firms sign up quickly. You help them protect their model instead of disrupting it.",
+         who:"Consultants work faster. Firms keep their prices.",
+         lesson:"Incumbents absorb new tools to protect their model."}
+      ]},
+      {sec:2, area:"First customers",
+       prompt:"The threat of new entrants is strong because consulting needs no licence. Your product is ready to sell.",
+       call:"You decide who you sell to first.",
+       options:[
+        {l:"Big corporations, to replace their consultants", s:"Go straight for the giants' clients.", e:{growth:15,cash:-15,indep:5},
+         r:"Huge contracts, but sales take a year and buyers want references you don't have yet.",
+         who:"Large clients test you against McKinsey.",
+         lesson:"Big clients trust established brands."},
+        {l:"Consulting firms themselves", s:"Sell the tools to the incumbents.", e:{growth:10,cash:15,indep:-10},
+         r:"Fast money, but your biggest customers are the firms you set out to disrupt.",
+         who:"Your customers are also your future rivals.",
+         lesson:"Incumbents can turn a threat into a tool."},
+        {l:"Small and mid-sized businesses that can't afford McKinsey", s:"Start at the low end.", e:{growth:10,cash:5,indep:5},
+         r:"Lots of small customers sign up quickly. Each one pays little.",
+         who:"Small firms get affordable advice for the first time.",
+         lesson:"New entrants often start at the low end of a market."},
+        {l:"A marketplace linking clients to freelance consultants using your AI", s:"Freelancers plus AI.", e:{growth:10,cash:-5,indep:10},
+         r:"Like Eden McCallum and GLG in the case, plus AI. You must attract clients and experts at the same time.",
+         who:"Freelance consultants find new clients through you.",
+         lesson:"Freelancers are a substitute for big firms."}
+      ]},
+      {sec:3, area:"The trust gap",
+       prompt:"Big clients tell you their board trusts McKinsey's name for major decisions. They ask why they should trust a startup.",
+       call:"You decide how to earn credibility.",
+       options:[
+        {l:"Recruit former McKinsey partners as advisers", s:"Borrow credibility.", e:{growth:10,cash:-10,indep:0},
+         r:"Their names open boardroom doors. Their fees are high.",
+         who:"Former partners join your advisory board.",
+         lesson:"Prestige is McKinsey's strongest asset under Path A."},
+        {l:"Offer a guarantee: clients pay only if results arrive", s:"Prove value, not reputation.", e:{growth:10,cash:-10,indep:5},
+         r:"Clients trust results over names. You carry the risk if projects underperform.",
+         who:"Clients carry less risk. Your cash flow carries more.",
+         lesson:"Outcome-based pricing answers the ROI question."},
+        {l:"Partner with a Big Four firm and sell through them", s:"Use their brand.", e:{growth:10,cash:5,indep:-10},
+         r:"Their brand gives you instant credibility. They take a share and control the client relationship.",
+         who:"A Big Four firm resells your product.",
+         lesson:"Big firms use partnerships to keep new entrants close."},
+        {l:"Skip big clients and focus on small businesses", s:"Avoid the fight for prestige.", e:{growth:0,cash:5,indep:10},
+         r:"You don't need to beat McKinsey's name. Your market is smaller but loyal.",
+         who:"Small businesses get a dedicated partner.",
+         lesson:"Not every new entrant has to compete head-on."}
+      ]},
+      {sec:4, area:"The offer",
+       prompt:"McKinsey is building its tech capabilities and offers $100M to buy your company.",
+       call:"You decide your company's future.",
+       options:[
+        {l:"Refuse and raise venture funding to scale", s:"Bet on becoming big.", e:{growth:15,cash:10,indep:-5},
+         r:"Investors back you. Now you need to grow fast enough to justify it.",
+         who:"Investors own more of your company.",
+         lesson:"Strong new entrants keep pressure on incumbents."},
+        {l:"Sell. Take the money", s:"A life-changing exit.", e:{growth:0,cash:30,indep:-40}, flag:"sold",
+         r:"You're rich, and your tool now powers McKinsey's teams. The disruption becomes McKinsey's advantage.",
+         who:"Your team joins McKinsey. You step back.",
+         lesson:"Path B: Salesforce bought BeyondCore for $110M in 2016, and McKinsey bought QuantumBlack."},
+        {l:"Partner: McKinsey resells your tool, you stay independent", s:"Their client list, your product.", e:{growth:10,cash:15,indep:-10},
+         r:"Revenue jumps through McKinsey's client list. You now depend on a partner who might copy you.",
+         who:"McKinsey's clients start using your tool.",
+         lesson:"Incumbents partner with new entrants to learn from them."},
+        {l:"Refuse and grow slowly from your own revenue", s:"Stay in full control.", e:{growth:-5,cash:-5,indep:15},
+         r:"You keep full control, but funded rivals move faster.",
+         who:"Your team stays small and focused.",
+         lesson:"Independence has a cost."}
+      ]},
+      {sec:5, area:"Data and trust",
+       prompt:"A large client wants your AI to analyse its customers' personal data. You are not sure the client has permission to use it this way.",
+       call:"You decide how your company handles data.",
+       options:[
+        {l:"Refuse until the client proves it has consent", s:"No consent, no project.", e:{growth:-5,cash:-5,indep:5},
+         r:"The deal is delayed, but your careful data handling becomes a selling point.",
+         who:"The client's legal team has extra work.",
+         lesson:"Trust can be a new entrant's advantage."},
+        {l:"Go ahead. It's the client's responsibility", s:"Move fast.", e:{growth:10,cash:10,indep:0}, flag:"scandal",
+         r:"Six months later regulators investigate the client and your company is named. Investors and customers pull back.",
+         who:"Customers whose data was used complain publicly.",
+         lesson:"One scandal can stop a young firm, as it stopped Monitor Group."},
+        {l:"Use only anonymised data", s:"Less detail, no privacy risk.", e:{growth:5,cash:0,indep:0},
+         r:"The analysis is less detailed, but there is no privacy risk. The client accepts.",
+         who:"Customers' identities stay protected.",
+         lesson:"Managing risk without losing the deal."},
+        {l:"Bring in an independent privacy audit first", s:"Prove you are safe.", e:{growth:0,cash:-5,indep:5},
+         r:"It costs time and money, but you can show every client exactly how data is handled.",
+         who:"An auditor reviews your systems.",
+         lesson:"Transparency builds legitimacy."}
+      ]}
+    ],
+    ending(m,f){
+      if(f.scandal) return "fallout";
+      if(f.sold) return "acq";
+      if(m.cash<35) return "burn";
+      if(m.growth>=85) return "disrupt";
+      return "niche";
+    },
+    endings:{
+      fallout:{t:"Regulator's Target", s:"Your growth stalled when your name appeared in a privacy investigation. Customers now ask hard questions before signing.", m:"Trust is the hardest barrier for new entrants, and McKinsey's strongest defence."},
+      acq:{t:"Acquired", s:"You sold to McKinsey. Your AI now makes their teams faster, and the threat you posed became their tool.", m:"Buying AI capability is one way McKinsey can respond."},
+      burn:{t:"Burned Out", s:"You grew fast but ran out of money before the market caught up.", m:"Disruption is hard. That gives McKinsey time, but not forever."},
+      disrupt:{t:"The Disruptor", s:"Clients now get research and analysis from you in minutes, at a fraction of the price. Junior consulting work is shrinking.", m:"This is the AI threat to McKinsey's leverage model."},
+      niche:{t:"The Niche Player", s:"You built a solid business serving a clear segment. You haven't shaken the giants yet.", m:"Many new entrants nibble at the edges instead of replacing incumbents."}
+    }
+  }
+};
+
+const app = document.getElementById("app");
+let S = {};
+const LETTERS = ["A","B","C","D"];
+const clamp = v => Math.max(0, Math.min(100, v));
+
+function toTop(){ try{ window.scrollTo({top:0, behavior:"instant"}); }catch(e){ window.scrollTo(0,0); } }
+function view(html){ app.className = "wrap anim"; app.innerHTML = html; toTop(); }
+function secTag(n){ return `<span class="sec">Section ${n} · ${SECTIONS[n]}</span>`; }
+
+function home(){
+  const cards = Object.entries(ROLES).map(([id,r]) => `
+    <button class="role" style="--rc:${r.color}" data-role="${id}">
+      <span class="table-no">Table ${r.table}</span>
+      <span class="tile">${r.letter}</span>
+      <span class="t">${r.name}</span>
+      <span class="p">${r.title}</span>
+      <span class="g">${r.goal}</span>
+    </button>`).join("");
+  const map = [1,2,3,4,5].map(n=>`<div><span class="n">Decision ${n}</span><span>${SECTIONS[n]}</span></div>`).join("");
+  view(`
+    <header class="warhero">
+      <div class="wh-scan" aria-hidden="true"></div>
+      <div class="wh-top">
+        <span class="wh-live"><i></i>Briefing in session</span>
+        <span>MGMT5603</span>
+      </div>
+      <p class="wh-kicker">Operation · AI Disruption</p>
+      <h1>The McKinsey<span>War Room</span></h1>
+      <p class="wh-lede">AI is reshaping consulting. Each table takes a leadership seat at one of four organisations and makes five decisions drawn from our presentation. Your choices shape your organisation's future.</p>
+      <div class="wh-meta">
+        <div><b>4</b><span>Tables</span></div>
+        <div><b>5</b><span>Decisions</span></div>
+        <div><b>~6</b><span>Minutes</span></div>
+        <div><b>1</b><span>Device per table</span></div>
+      </div>
+    </header>
+
+    <section class="stack">
+      <div class="section-label"><h3>How to play</h3><span class="eyebrow">6 steps</span></div>
+      <ol class="steps">
+        <li><div><b>Select your table's role</b><span>Each table leads a different organisation: McKinsey, a client bank, Accenture or an AI startup. Your briefing explains your position, who you answer to, what you control and what is at stake.</span></div></li>
+        <li><div><b>Make five decisions</b><span>Each decision is based on one section of our presentation. Discuss the situation as a table and agree on one of four options. There is no single correct answer, and every option has trade-offs.</span></div></li>
+        <li><div><b>Review the consequences</b><span>After each decision you will see what happened, how it affects your position, who else is affected, and how your three scores change.</span></div></li>
+        <li><div><b>Receive your outcome</b><span>After the fifth decision, your scores determine your ending. You will see a summary of every choice and what your outcome means for McKinsey.</span></div></li>
+        <li><div><b>Be ready to explain your decisions</b><span>For each decision, agree as a table on why you chose it. In the debrief you will be asked to explain your reasoning and the outcome it led to.</span></div></li>
+        <li><div><b>Share your outcome in the debrief</b><span>The presenter will ask each table for its ending and the decision it found hardest to agree on.</span></div></li>
+      </ol>
+    </section>
+
+    <section class="stack">
+      <div class="section-label"><h3>Your scores</h3></div>
+      <p class="note">Each role tracks three scores from 0 to 100. Everyone starts at 50. Each choice raises or lowers them, and your final scores decide your ending. Aim for a balance: a very low score in any area can decide your outcome on its own.</p>
+    </section>
+
+    <section class="stack">
+      <div class="section-label"><h3>How the decisions follow our presentation</h3></div>
+      <div class="map">${map}</div>
+      <p class="note">Your ending connects to Section 6, where we present our group's recommendation.</p>
+    </section>
+
+    <section class="stack">
+      <div class="section-label"><h3>Choose your table's role</h3><span class="eyebrow">4 roles</span></div>
+      <div class="roles">${cards}</div>
+    </section>
+    <footer class="disclaimer"><span class="eyebrow">Disclaimer</span><p>A class activity based on Mike W. Peng's case "The Consulting Industry". Scenario figures are illustrative. Not affiliated with McKinsey, Accenture or any firm named.</p></footer>
+  `);
+  app.querySelectorAll("[data-role]").forEach(b => b.onclick = () => brief(b.dataset.role));
+}
+
+function brief(id){
+  const r = ROLES[id];
+  S = {id, r, step:0, m:Object.fromEntries(Object.keys(r.metrics).map(k=>[k,50])), picks:[], flags:{}};
+  view(`
+    <div style="--rc:${r.color};display:flex;flex-direction:column;gap:18px">
+      <span class="eyebrow">Table ${r.table} · Your briefing</span>
+      <div class="stamp">
+        <span class="badge">Your position</span>
+        <h2>${r.title}</h2>
+        <p style="font-size:1.05rem">You lead <b>${r.org}</b>. ${r.situation}</p>
+      </div>
+      <dl class="seat" style="margin:0">
+        <div><dt>Your goal</dt><dd>${r.goal}</dd></div>
+        <div><dt>You answer to</dt><dd>${r.answer}</dd></div>
+        <div><dt>You control</dt><dd>${r.control}</dd></div>
+        <div><dt>What is at stake</dt><dd>${r.stake}</dd></div>
+      </dl>
+      <div class="bar">
+        <span class="eyebrow">Your starting scores</span>
+        ${meters(r, S.m)}
+      </div>
+      <div class="btns">
+        <button class="btn" id="go">Begin decision 1</button>
+        <button class="btn ghost" id="back">Choose a different role</button>
+      </div>
+    </div>`);
+  document.getElementById("go").onclick = decision;
+  document.getElementById("back").onclick = home;
+}
+
+function meters(r, m){
+  return `<div class="meters">${Object.entries(r.metrics).map(([k,lab]) =>
+    `<div class="meter"><span class="lab">${lab}</span><span class="track"><span class="fill" style="width:${m[k]}%"></span></span><span class="val">${m[k]}</span></div>`).join("")}</div>`;
+}
+function header(){
+  const r = S.r, n = r.decisions.length;
+  const segs = Array.from({length:n},(_,i)=>`<span class="${i<=S.step?'on':''}"></span>`).join("");
+  return `<div class="bar">
+      <div class="bar-top">
+        <span class="chip"><i></i>${r.title} · ${r.name}</span>
+        <span style="display:flex;align-items:center;gap:10px"><span class="eyebrow">Decision ${S.step+1} of ${n}</span><span class="prog">${segs}</span></span>
+      </div>
+      ${meters(r, S.m)}
+    </div>`;
+}
+
+function decision(){
+  const r = S.r, d = r.decisions[S.step];
+  const opts = d.options.map((o,i)=>`
+    <button class="opt" data-i="${i}">
+      <span class="k">${LETTERS[i]}</span>
+      <span><span class="ol">${o.l}</span><span class="os">${o.s}</span></span>
+    </button>`).join("");
+  view(`<div style="--rc:${r.color};display:flex;flex-direction:column;gap:20px">
+      ${header()}
+      <div class="prompt">
+        ${secTag(d.sec)}
+        <h3>${d.area}</h3>
+        <p>${d.prompt}</p>
+        <p class="yourcall"><b>Your call as ${r.title}:</b> ${d.call}</p>
+      </div>
+      <div class="opts">${opts}</div>
+      <p class="eyebrow" style="text-align:center">Agree as a table, then select one option</p>
+    </div>`);
+  app.querySelectorAll("[data-i]").forEach(b => b.onclick = () => choose(+b.dataset.i));
+}
+
+function standing(r, net){
+  if(net >= 10) return {c:"up", t:`Your standing as ${r.title} is stronger. ${cap(r.judge)} back this decision.`};
+  if(net <= -10) return {c:"down", t:`Pressure on you as ${r.title} is rising. ${cap(r.judge)} are questioning this decision.`};
+  return {c:"flat", t:`Your position as ${r.title} is steady, but ${r.judge} are watching closely.`};
+}
+function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function choose(i){
+  const r = S.r, d = r.decisions[S.step], o = d.options[i];
+  const before = {...S.m};
+  for(const k in o.e) S.m[k] = clamp(S.m[k] + o.e[k]);
+  if(o.flag) S.flags[o.flag] = true;
+  S.picks.push({d, o, i});
+  let net = 0;
+  const chips = Object.entries(r.metrics).map(([k,lab])=>{
+    const v = S.m[k]-before[k]; net += v;
+    const cls = v>0?"up":v<0?"down":"flat";
+    return `<span class="delta ${cls}">${lab} ${v>0?"+":v<0?"−":"±"}${Math.abs(v)}</span>`;
+  }).join("");
+  const st = standing(r, net);
+  const last = S.step === r.decisions.length-1;
+  view(`<div style="--rc:${r.color};display:flex;flex-direction:column;gap:20px">
+      ${header()}
+      <div class="result">
+        ${secTag(d.sec)}
+        <div class="qbox"><span class="eyebrow">The question · ${d.area}</span><span>${d.prompt}</span></div>
+        <p class="picked">As ${r.title}, you chose <b>${LETTERS[i]}. ${o.l}</b></p>
+        <p class="what">${o.r}</p>
+        <div class="impact">
+          <div><span class="eyebrow">Your position</span><span class="v standing ${st.c}">${st.t}</span></div>
+          <div><span class="eyebrow">Who else is affected</span><span class="v">${o.who}</span></div>
+          <div><span class="eyebrow">Score changes</span><span class="deltas">${chips}</span></div>
+        </div>
+        <div class="lesson"><span class="eyebrow">Link to our presentation</span><span>${o.lesson}</span></div>
+      </div>
+      <button class="btn" id="next">${last ? "See your outcome" : "Continue to decision " + (S.step+2)}</button>
+    </div>`);
+  document.getElementById("next").onclick = () => { if(last) ending(); else { S.step++; decision(); } };
+}
+
+function ending(){
+  const r = S.r, key = r.ending(S.m, S.flags), e = r.endings[key];
+  const recap = S.picks.map(p=>`
+    <div class="row">
+      <span class="eyebrow">Decision ${p.d.sec} · ${SECTIONS[p.d.sec]}</span>
+      <span class="q"><b>${p.d.area}.</b> ${p.d.prompt}</span>
+      <span class="ch"><span class="lbl">You chose</span>${LETTERS[p.i]}. ${p.o.l}</span>
+      <span class="ls"><span class="lbl">Outcome</span>${p.o.r}</span>
+      <span class="ls"><span class="lbl">Link to our presentation</span>${p.o.lesson}</span>
+    </div>`).join("");
+  view(`<div style="--rc:${r.color};display:flex;flex-direction:column;gap:20px">
+      <span class="eyebrow">Table ${r.table} · ${r.title}, ${r.name} · Your outcome</span>
+      <div class="stamp">
+        <span class="badge">Outcome</span>
+        <h2>${e.t}</h2>
+        <p style="font-size:1.05rem">${e.s}</p>
+      </div>
+      <div class="bar"><span class="eyebrow">Final scores</span>${meters(r, S.m)}</div>
+      <div class="meaning"><span class="eyebrow">Section 6 · What this means for McKinsey</span><p>${e.m}</p></div>
+      <div class="debrief"><b>For the debrief</b><span>Be ready to share your outcome, explain why your table made its key decisions, and name the decision you found hardest to agree on.</span></div>
+      <section class="stack">
+        <h3>Your five decisions</h3>
+        <div class="recap">${recap}</div>
+      </section>
+      <div class="btns">
+        <button class="btn" id="again">Replay this role</button>
+        <button class="btn ghost" id="other">Choose another role</button>
+      </div>
+    </div>`);
+  document.getElementById("again").onclick = () => brief(S.id);
+  document.getElementById("other").onclick = home;
+}
+
+home();
+})();
+</script>
+</body>
+</html>
